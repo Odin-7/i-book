@@ -14,4 +14,15 @@
 
 <style>
 	/*每个页面公共css */
+	::-webkit-scrollbar {
+	  width: 0 !important;
+	}
+	::-webkit-scrollbar {
+	  width: 0 !important;
+	  height: 0;
+	}
+	::-webkit-scrollbar {
+		/*隐藏滚轮*/
+		display: none;
+	}
 </style>

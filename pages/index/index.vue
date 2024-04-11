@@ -1,38 +1,70 @@
 <template>
-	<view class="content">
-		<aloys-tab :tabs="tabs" @change="onTabChange">
-			<view slot="content0" class="xxx">
-			 <lv-select
-			        @handleSearch = "handleSearch"
-			        @change = "change"
-			        placeholder = "请输入信息"
-			        :infoList = "infoList"
-					:showValue = "showValue"
-			        v-model = "searchValue"
-			        :loading = "loading"
-			        type = "success "
-			        :uniShadow = "true"
-			        ></lv-select>
-			<booklist></booklist>
+	<view class="container">
+		<!-- 搜索 -->
+		<view class="search-header">
+			<u-search
+				shape="round"
+				v-model="keyword"
+				placeholder="搜索书库"
+				:clearabled="false"
+				searchIconSize="28px" 
+				actionText="取消" 
+				:animation="true"
+				@custom="onCancel"
+				height="70"
+				color="#000000"
+			></u-search>
+		</view>
+		<!-- tab栏 -->
+		<u-sticky offset-top="30" bgColor="#ffffff">
+			<view class="tabs-header">
+				<u-tabs
+					:list="tabs"
+					 lineWidth="30"
+					 lineHeight="7"
+					:activeStyle="{
+						color: '#000000',
+						fontWeight: 'bold',
+						transform: 'scale(1.1)'
+					}"
+					 :inactiveStyle="{
+						color: '#606266',
+					}"
+					itemStyle="padding-left: 15px; padding-right: 15px; height: 34px;"
+				></u-tabs>
 			</view>
-			<view slot="content1" class="xxx">
-				<lv-select
-				        @handleSearch = "handleSearch"
-				        @change = "change"
-				        placeholder = "请输入信息"
-				        :infoList = "infoList"
-						:showValue = "showValue"
-				        v-model = "searchValue"
-				        :loading = "loading"
-				        type = "success "
-				        :uniShadow = "true"
-				        ></lv-select>
-				<booklistworman></booklistworman>
-			</view>
-			<view slot="content2" class="xxx">
-				<publish></publish>
-			</view>
-		</aloys-tab>
+		</u-sticky>
+		<view class="list-main" v-if="list && list.length > 0">
+			<u-list
+				@scrolltolower="scrolltolower"
+			>
+				<u-list-item
+					v-for="(item, index) in indexList"
+					:key="index"
+				>
+					
+					<u-cell
+						:title="`列表长度-${index + 1}`"
+					>
+						<u-avatar
+							slot="icon"
+							shape="square"
+							size="35"
+							:src="item.url"
+							customStyle="margin: -3px 5px -3px 0"
+						></u-avatar>
+					</u-cell>
+				</u-list-item>
+			</u-list>
+		</view>
+		<view class="list-empty" v-else>
+			<!-- icon="https://cdn.uviewui.com/uview/demo/empty/data.png" -->
+			<u-empty
+				mode="search"
+			>
+			</u-empty>
+		</view>
+		
 	</view>
 </template>
 
@@ -57,78 +89,84 @@
 		},
 		data() {
 			return {
-				picUrl:"",
-				 loading: false,
-                showValue: 'name', // 需要显示的数据，必须与infoList中的name对应
-                searchValue: '',
-                infoList: [],
-                infoLists: [{
-                    name: '遮天'
-                },{
-                    name: '神墓'
-                },{
-                    name: '完美世界'
-                },{
-                    name: '圣墟'
-                }],
+				keyword: '',
 				tabs: [{
-					title: '男生'
+					name: '关注关注',
 				}, {
-					title: '女生'
+					name: '推荐',
 				}, {
-					title: '出版'
-				}]
+					name: '电影'
+				}, {
+					name: '科技'
+				}, {
+					name: '音乐'
+				}, {
+					name: '美食'
+				}, {
+					name: '文化'
+				}, {
+					name: '财经'
+				}, {
+					name: '手工'
+				}],
+				list:['111'],
+				indexList: [],
+				urls: [
+					'https://cdn.uviewui.com/uview/album/1.jpg',
+					'https://cdn.uviewui.com/uview/album/2.jpg',
+					'https://cdn.uviewui.com/uview/album/3.jpg',
+					'https://cdn.uviewui.com/uview/album/4.jpg',
+					'https://cdn.uviewui.com/uview/album/5.jpg',
+					'https://cdn.uviewui.com/uview/album/6.jpg',
+					'https://cdn.uviewui.com/uview/album/7.jpg',
+					'https://cdn.uviewui.com/uview/album/8.jpg',
+					'https://cdn.uviewui.com/uview/album/9.jpg',
+					'https://cdn.uviewui.com/uview/album/10.jpg',
+				]
 			}
 		},
-		
-		methods: {
-			onTabChange(obj) {
-				uni.showToast({
-					title: '切换成功',
-					icon: 'none',
-					duration:500,
-					mask:false
-
-				})
-			},
-			handleSearch() {
-			                this.loading = true
-			                setTimeout(() => {
-			                    this.loading = false
-			                    this.infoList = this.infoLists
-			                }, 2000)
-			            },
-						
-						
-
+		onLoad() {	
+			this.loadmore()
 		},
-		
-		      // onLoad: function (options) {
-		      //      setTimeout(function () {
-		      //          console.log('start pulldown');
-		      //      }, 1000);
-		      //      uni.startPullDownRefresh();
-		      //  },
-		      onPullDownRefresh(){
-		      	console.log('触发下拉刷新了')
-		      }
-
+		methods: {
+			onCancel(){
+				this.keyword = ''
+			},
+			
+			scrolltolower() {
+				this.loadmore()
+			},
+			loadmore() {
+				for (let i = 0; i < 30; i++) {
+					this.indexList.push({
+						url: this.urls[uni.$u.random(0, this.urls.length - 1)]
+					})
+					}
+				}
+			}
 		
 	}
 	
 </script>
 
-<style>
-	.content {
-		position: absolute;
+<style lang="scss">
+	.container {
 		height: 100%;
-	}
-
-	.xxx {
 		width: 100%;
-		font-size: 42rpx;
-		font-weight: bold;
-		padding: 10rpx 0;
-		text-align: center;
+		position: relative;
+		.search-header{
+			padding: 10px 12px;
+		}
+		.tabs-header{
+			heiht:70px;
+			background-color: 'pink'
+		}
+		.list-main{
+			padding: 10px 12px;
+			padding-top: 5px;
+		}
+		.list-empty{
+			margin-top: 25%;
+		}
 	}
 </style>
