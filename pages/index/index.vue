@@ -170,6 +170,7 @@
 </script>
 
 <style lang="scss">
+	$base-url: "@/static/books/book-cover-";
 	.container {
 		margin: 0 auto;
 		max-width: 1000px;
@@ -227,16 +228,29 @@
 				@media screen and (max-width: 450px) {
 					height: 180px;
 				}
+				// &:nth-child(12n){
+				// 	.book-cover{
+				// 		background-image: url(@/static/books/book-cover-1.png);
+				// 	}
+				// }
+				@for $i from 1 through 7 {
+				  &:nth-child(#{$i}n) {
+				    .book-cover {
+				      background-image: url(#{$base-url + $i}.png);
+				    }
+				  }
+				}
 				.book-cover{
 					width: 100%;
 					height: 100%;
-					background-image: url(@/static/list/book-cover.png);
+					
 					background-repeat: no-repeat;
 					background-size: cover;
 					background-position: 0% 100%;
 					box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
 					border-radius: 4px; 
 				}
+				
 				.book-title{
 					text-align: center;
 					margin-top:5px;
