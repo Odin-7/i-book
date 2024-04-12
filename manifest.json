@@ -83,9 +83,11 @@
             "disableHostCheck" : true,
             "proxy" : {
                 "/api/*" : {
-                    "target" : "https://wechat.idejian.com/", //请求的目标域名
+                    // "target" : "https://wechat.idejian.com/", //请求的目标域名
+                    "target" : "https://route.showapi.com/", //请求的目标域名
                     "changeOrigin" : true,
-                    "secure" : true
+                    "secure" : true,
+					"pathRewrite":{"^/api" : ""}
                 }
             }
         },

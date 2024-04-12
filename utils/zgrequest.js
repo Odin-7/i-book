@@ -21,9 +21,6 @@ export default function myRequestGet(url, data) {
 			}
 		})
 	})
-
-
-
 }
 
 export function myRequestPost(url, data) {

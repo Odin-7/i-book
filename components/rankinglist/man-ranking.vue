@@ -30,12 +30,14 @@
 			}
 		},
 		created() {
+			console.log(myRequestGet)
 			this.getRankingList();
 			//this.getRankingListTwo();
 		},
 		methods: {
 			async getRankingList() {
 				const res = await myRequestGet('/api/wechat/subrank?sectionId=37988&page=1')
+				console.log(res)
 				this.RankingList = res.body.books
 				console.log(this.RankingList)
 			},

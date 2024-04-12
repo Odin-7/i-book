@@ -3,8 +3,9 @@
 		<!-- 搜索 -->
 		<view class="search-header">
 			<u-search
+				@change = "getContentList"
 				shape="round"
-				v-model="keyword"
+				v-model="params.keyword"
 				placeholder="搜索书库"
 				:clearabled="false"
 				searchIconSize="28px" 
@@ -16,9 +17,10 @@
 			></u-search>
 		</view>
 		<!-- tab栏 -->
-		<u-sticky offset-top="30px" bgColor="#ffffff">
+		<u-sticky offset-top="30" bgColor="#ffffff">
 			<view class="tabs-header">
 				<u-tabs
+					v-if="tabs && tabs.length > 0"
 					swipeable  
 					:list="tabs"
 					 lineWidth="20px"
@@ -32,18 +34,20 @@
 						color: '#606266',
 					}"
 					itemStyle="padding-left: 15px; padding-right: 15px; height: 34px;"
+					@click="handleTabClick"
 				></u-tabs>
+				<!-- v-else -->
 			</view>
 		</u-sticky>
 		<!-- <u-gap height="20" bg-color="#f2f2f2"></u-gap> -->
 		<view class="list-main" v-if="list && list.length > 0">
 			<div 
-				v-for="(item, index) in indexList"
-				:key="index"
+				v-for="(item, index) in list"
+				:key="item.id"
 				class="list-item"
 				>
-					<div class="book-cover"></div>
-					<div class="book-title">格林童话故事</div>
+					<div class="book-cover" @click="toDetail(item)"></div>
+					<div class="book-title">{{item.title}}</div>
 			</div>
 		</view>
 		<view class="list-empty" v-else>
@@ -61,48 +65,21 @@
 </template>
 
 <script>
-	import aloysTab from "@/components/aloys-tab/aloys-tab.vue"
-	import lvSelect from '../../components/lv-select/lv-select'
-	import booklist from '../../components/booklist/booklist.vue'
-	import icon from '../../components/dn-icon/dn-icon.vue'
-	import booklistworman from '../../components/booklist/booklistworman.vue'
-	import publish from "../../components/publish/publish.vue"
-
+	import { paramsGet } from '@/utils/request.js'
+	import { debounce } from '@/utils/debounce.js'
 	export default {
-		
-		components: {
-			aloysTab,
-			lvSelect,
-			booklist,
-			icon,
-			booklistworman,
-			publish,
-		
-		},
 		data() {
 			return {
 				scrollTop: 0,//返回顶部
-				keyword: '',
-				tabs: [{
-					name: '关注关注',
-				}, {
-					name: '推荐',
-				}, {
-					name: '电影'
-				}, {
-					name: '科技'
-				}, {
-					name: '音乐'
-				}, {
-					name: '美食'
-				}, {
-					name: '文化'
-				}, {
-					name: '财经'
-				}, {
-					name: '手工'
-				}],
-				list:['111'],
+				params:{
+					keyword: '',
+					classifyId:1, //分类
+					page:1 //页码
+				},
+				id:'',//故事详情id
+				tabs: [], //分类
+				
+				list:[],
 				indexList: [],
 				urls: [
 					'https://cdn.uviewui.com/uview/album/1.jpg',
@@ -118,6 +95,10 @@
 				]
 			}
 		},
+		created() {
+			this.getClassifyTabs();
+			this.getContentList()
+		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop;
 		},
@@ -125,8 +106,51 @@
 			this.loadmore()
 		},
 		methods: {
+			// 获取故事分类
+			async getClassifyTabs() {
+				try {
+					// const res = await classifyGet(`/1700-1?showapi_appid=1571609&showapi_timestamp=${getCurrentDateTime()}&showapi_sign=bf08e510d4a642fb9e168ada13400dbf`)
+					const res = await paramsGet('/1700-1')
+					if(res && res.showapi_res_body.storylist){
+						this.tabs = res.showapi_res_body.storylist.map(item => ({
+						  name: item.classify,
+						  classifyId: item.classifyId 
+						}));
+					}
+				 } catch (error) {
+					console.log("获取分类信息失败", error);
+				  }
+			},
+			// 获取列表
+			async getContentList() {
+				try {
+					// const res = await classifyGet(`/1700-1?showapi_appid=1571609&showapi_timestamp=${getCurrentDateTime()}&showapi_sign=bf08e510d4a642fb9e168ada13400dbf`)
+					const res = await paramsGet('/1700-2',this.params)
+					if(res && res.showapi_res_body.contentlist){
+						this.list = res.showapi_res_body.contentlist
+					}
+				 } catch (error) {
+					console.log("获取书籍列表失败", error);
+				  }
+				
+			},
+			// 切换tab
+			handleTabClick(tab){
+				this.params.classifyId = tab.classifyId
+				this.getContentList()
+			},
+			// 详情
+			toDetail(item){
+				uni.navigateTo({
+					url: `../bookdetail/bookdetail?id=${item.id}&title=${item.title}`
+				})
+			},
+			// 搜索
+			// onSearch: debounce(() => {
+			// 	this.getContentList();
+			// }, 300),
 			onCancel(){
-				this.keyword = ''
+				this.params.keyword = ''
 			},
 			
 			scrolltolower() {
@@ -157,6 +181,7 @@
 			padding-bottom: 8px;
 		}
 		.tabs-header{
+			height: 34px;
 			padding-bottom: 3px;
 			border-bottom: 1px solid #f2f2f2;
 		}

@@ -14,82 +14,19 @@
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "书库",
-				"enablePullDownRefresh": true
+				"enablePullDownRefresh": false
 			}
-		}, {
-			"path": "pages/my/my",
-			"style": {
-				"navigationBarTitleText": "我的",
-				"enablePullDownRefresh": true
-			}
-
-		}, {
-			"path": "pages/bookshelf/bookshelf",
-			"style": {
-				"navigationBarTitleText": "书架",
-				"enablePullDownRefresh": true
-			}
-
-		}, {
-			"path": "pages/Ranking/Ranking",
-			"style": {
-				"navigationBarTitleText": "排行",
-				"enablePullDownRefresh": true
-			}
-
-		}, {
-			"path": "pages/tobiao/tobiao",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": true
-			}
-
-		}, {
-			"path": "pages/classification/classification",
-			"style": {
-				"navigationBarTitleText": "分类",
-				"enablePullDownRefresh": true
-			}
-
-		}, {
+		},
+		{
 			"path": "pages/bookdetail/bookdetail",
 			"style": {
-				"navigationBarTitleText": "书籍详情",
-				"enablePullDownRefresh": true,
-				"navigationBarBackgroundColor": "#b0b0b0"
-
+				"navigationBarTitleText": "详情"
+			
+				// "navigationBarBackgroundColor": "#b0b0b0"
+				// "enablePullDownRefresh": false,
+				// "navigationStyle": "custom" ,// 隐藏系统导航栏
+				// "navigationBarTextStyle": "white" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
 			}
-
-		},
-		{
-			"path": "pages/details/details",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
-			"path": "pages/detail/detail",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
-			"path": "pages/bookshelfs/bookshelfs",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false,
-				"onReachBottomDistance": 20
-			}
-		}, {
-			"path": "pages/mulv/mulv",
-			"style": {
-				"navigationBarTitleText": "目录"
-			}
-		}, {
-			"path": "pages/mys/mys",
-			"style": {}
 		}
 	],
 	"globalStyle": {
