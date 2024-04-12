@@ -74,14 +74,7 @@
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-		}
-
-
-
-
-
-
-		,
+		},
 		{
 			"path": "pages/bookshelfs/bookshelfs",
 			"style": {
@@ -104,7 +97,7 @@
 		"navigationBarTitleText": "书库",
 		"navigationBarBackgroundColor": "#ffffff",
 		"backgroundColor": "#ffffff",
-		"enablePullDownRefresh": true,
+		"enablePullDownRefresh": false,
 		"backgroundTextStyle": "dark"
 	}
 	
