@@ -1,15 +1,10 @@
 <template>
 	<view class="page">
-		<!-- <u-navbar
-			:title="title"
-			@rightClick="rightClick"
-			:autoBack="true"
-		>
-		</u-navbar> -->
-		<view class="book-content">
-			<div v-html="content">{{content}}</div>
-		</view>
-		
+		<transition name="book-open">
+			<view v-if="isBookOpen" class="book-content">
+				<div v-html="content">{{content}}</div>
+			</view>
+		</transition>
 	</view>
 </template>
 
@@ -19,13 +14,13 @@
 		data() {
 			return {
 				title:'', //标题
-				content:''//内容
-				
+				content:'', //内容
+				isBookOpen: false // 控制书本打开效果的状态
 			}
 		},
-		onLoad: function (option) { //option为object类型，会序列化上个页面传递的参数
-			console.log(option.id); //打印出上个页面传递的参数。
-			console.log(option.title); //打印出上个页面传递的参数。
+		onLoad: function (option) {
+			console.log(option.id);
+			console.log(option.title);
 			this.title = option.title
 			this.id = option.id
 		},
@@ -33,14 +28,15 @@
 			this.getContent(this.id)
 		},
 		methods: {
-			// 获取书籍详情
 			async getContent(id) {
 				console.log(id)
 				try {
 					const res = await paramsGet('/1700-3',{id})
 					console.log(res)
 					if(res && res.showapi_res_body.content){
+						// 在获取内容后设置状态为打开书本效果
 						this.content = res.showapi_res_body.content
+						this.isBookOpen = true
 					}
 				 } catch (error) {
 					console.log("获取内容失败", error);
@@ -56,5 +52,12 @@
 		.book-content{
 			padding: 0px 20px;
 		}
+	}
+	/* 定义过渡效果 */
+	.book-open-enter-active, .book-open-leave-active {
+		transition: opacity 0.5s;
+	}
+	.book-open-enter, .book-open-leave-to {
+		opacity: 0;
 	}
 </style>

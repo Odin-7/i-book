@@ -78,21 +78,8 @@
 				},
 				id:'',//故事详情id
 				tabs: [], //分类
-				
 				list:[],
 				indexList: [],
-				urls: [
-					'https://cdn.uviewui.com/uview/album/1.jpg',
-					'https://cdn.uviewui.com/uview/album/2.jpg',
-					'https://cdn.uviewui.com/uview/album/3.jpg',
-					'https://cdn.uviewui.com/uview/album/4.jpg',
-					'https://cdn.uviewui.com/uview/album/5.jpg',
-					'https://cdn.uviewui.com/uview/album/6.jpg',
-					'https://cdn.uviewui.com/uview/album/7.jpg',
-					'https://cdn.uviewui.com/uview/album/8.jpg',
-					'https://cdn.uviewui.com/uview/album/9.jpg',
-					'https://cdn.uviewui.com/uview/album/10.jpg',
-				]
 			}
 		},
 		created() {
@@ -101,9 +88,6 @@
 		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop;
-		},
-		onLoad() {	
-			this.loadmore()
 		},
 		methods: {
 			// 获取故事分类
@@ -151,19 +135,9 @@
 			// }, 300),
 			onCancel(){
 				this.params.keyword = ''
-			},
-			
-			scrolltolower() {
-				this.loadmore()
-			},
-			loadmore() {
-				for (let i = 0; i < 101; i++) {
-					this.indexList.push({
-						url: this.urls[uni.$u.random(0, this.urls.length - 1)]
-					})
-					}
-				}
 			}
+			
+		}
 		
 	}
 	
@@ -209,11 +183,14 @@
 			  grid-template-columns: repeat(3, 1fr); // 在最小的屏幕下显示3列
 			}
 			>div{
+				position: relative;
+				// background: pink;
 				width: 100%; // 每个子项占满列宽
 				height: 250px;
 				padding: 10px;
-				padding-bottom: 0;
-				margin-bottom: 5px;
+				padding-bottom: 30px;
+				// padding-bottom: 0;
+				// margin-bottom: 5px;
 				box-sizing: border-box;
 				display: flex;
 				flex-direction: column;
@@ -243,7 +220,6 @@
 				.book-cover{
 					width: 100%;
 					height: 100%;
-					
 					background-repeat: no-repeat;
 					background-size: cover;
 					background-position: 0% 100%;
@@ -252,12 +228,20 @@
 				}
 				
 				.book-title{
+					position: absolute;
+					top: calc(100% - 30px);
 					text-align: center;
 					margin-top:5px;
-					white-space: nowrap; /* 禁止换行 */
-					overflow: hidden; /* 隐藏溢出的文本 */
-					text-overflow: ellipsis; /* 显示省略号 */
 					width: 150px;
+					// white-space: nowrap; /* 禁止换行 */
+					// overflow: hidden; /* 隐藏溢出的文本 */
+					// text-overflow: ellipsis; /* 显示省略号 */
+					overflow: hidden;
+					display: -webkit-box;
+					-webkit-line-clamp: 2; /* 显示的行数 */
+					-webkit-box-orient: vertical;
+					word-wrap: break-word; /* 允许长单词或URL在内部换行 */
+					text-overflow: ellipsis;
 					@media screen and (max-width: 768px) {
 						width: 110px;
 					}
