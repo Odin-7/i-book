@@ -1,5 +1,6 @@
 <template>
 	<view class="container">
+		
 		<!-- 搜索 -->
 		<view class="search-header">
 			<u-search
@@ -16,6 +17,20 @@
 				color="#000000"
 			></u-search>
 		</view>
+		<view class="swiper-header" v-if="!params.keyword">
+		   <u-swiper
+				height = "300"
+				:list="swiperList"
+				previousMargin="55"
+				nextMargin="55"
+				keyName="image"
+				showTitle
+				radius="10"
+				bgColor="#ffffff"
+				:autoplay="true"
+				circular
+			></u-swiper>
+		</view>
 		<!-- tab栏 -->
 		<u-sticky offset-top="30" bgColor="#ffffff">
 			<view class="tabs-header">
@@ -30,7 +45,7 @@
 						fontWeight: 'bold',
 						transform: 'scale(1.05)'
 					}"
-					 :inactiveStyle="{
+					:inactiveStyle="{
 						color: '#606266',
 					}"
 					itemStyle="padding-left: 15px; padding-right: 15px; height: 34px;"
@@ -40,20 +55,25 @@
 			</view>
 		</u-sticky>
 		<!-- 加载中 -->
-		<view class="is-loading" v-if="isLoading">
+		<view class="is-loading" v-if="isSearching">
 			<Loading />
 		    <div class="text">嘘！书本正在悄悄赶来，不要吓到它哦！</div>
 		</view>
 		<!-- 列表 -->
 		
-		<view class="list-main" v-else-if="list && list.length > 0">
-			<div 
-				v-for="(item, index) in list"
-				:key="item.id"
-				class="list-item"
-				>
-					<div class="book-cover" @click="toDetail(item)"></div>
-					<div class="book-title">{{item.title}}</div>
+		<view v-else-if="list && list.length > 0">
+			<div class="list-main">
+				<div
+					v-for="(item, index) in list"
+					:key="item.id"
+					class="list-item"
+					>
+						<div class="book-cover" @click="toDetail(item)"></div>
+						<div class="book-title">{{item.title}}</div>
+				</div>
+			</div>
+			<div class="list-status">
+				<u-loadmore line :status="status" fontSize="12px" loadingIcon="semicircle" :icon-type="iconType" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText"  />
 			</div>
 		</view>
 		<!-- 空 -->
@@ -63,7 +83,12 @@
 		</view>
 		<!-- 返回顶部 -->
 		<view class="back-top">
-			<u-back-top :scroll-top="scrollTop" top="1000" icon="arrow-up" :duration="250"></u-back-top>
+			<u-back-top 
+				:scroll-top="scrollTop" 
+				top="1000" 
+				icon="arrow-up" 	
+				:duration="250"
+			></u-back-top>
 		</view>
 	</view>
 </template>
@@ -75,17 +100,67 @@
 	export default {
 		data() {
 			return {
-				isLoading:false,
+				isSearching:false,
 				scrollTop: 0,//返回顶部
 				params:{
 					keyword: '',
 					classifyId:1, //分类
-					page:2 //页码
+					page:1 //页码
 				},
+				allNum: 0, //总数
+				allPages: 0, // 总页数
+				
 				id:'',//故事详情id
 				tabs: [], //分类
 				list:[],
-				indexList: [],
+				isLoading: false, // 是否正在加载数据
+				status: 'loadmore',
+				iconType: 'flower',
+				loadingText: '努力加载中',
+				loadmoreText: '轻轻上拉',
+				nomoreText: '没有更多了',
+				swiperList: [
+					{
+						image: require('@/static/swipers/1.png'),
+						title: '儿童小故事',
+					},
+					{
+						image: require('@/static/swipers/2.png'),
+						title: '安徒生童话'
+					},
+					{
+						image: require('@/static/swipers/3.png'),
+						title: '格林童话'
+					},
+					{
+						image: require('@/static/swipers/4.png'),
+						title: '一千零一夜'
+					},
+					{
+						image: require('@/static/swipers/5.png'),
+						title: '经典童话'
+					},
+					{
+						image: require('@/static/swipers/6.png'),
+						title: '成语故事'
+					},
+					{
+						image: require('@/static/swipers/7.png'),
+						title: '寓言故事'
+					},
+					{
+						image: require('@/static/swipers/8.png'),
+						title: '民间故事'
+					},
+					{
+						image: require('@/static/swipers/9.png'),
+						title: '童话故事'
+					},
+					{
+						image: require('@/static/swipers/10.png'),
+						title: '王尔德童话'
+					},
+				],
 			}
 		},
 		components: {
@@ -116,24 +191,59 @@
 			},
 			// 获取列表
 			async getContentList() {
-				this.isLoading = true
+				this.isSearching = true
+				// 搜索关键字改变时重置页码为1
+				this.params.page = 1;
+				// 清空列表
+				this.list = [];
 				try {
 					// const res = await classifyGet(`/1700-1?showapi_appid=1571609&showapi_timestamp=${getCurrentDateTime()}&showapi_sign=bf08e510d4a642fb9e168ada13400dbf`)
 					const res = await paramsGet('/1700-2',this.params)
 					if(res && res.showapi_res_body.contentlist){
 						this.list = res.showapi_res_body.contentlist
+						this.allNum = res.showapi_res_body.allNum
+						this.allPages = res.showapi_res_body.allPages
 					}
 				} catch (error) {
 					console.log("获取书籍列表失败", error);
 				} finally{
-					this.isLoading = false
+					this.isSearching = false
 				}
 				
+			},
+			// 滚动到底部时加载更多
+			async onReachBottom() {
+				if (this.params.page >= this.allPages) {
+					this.status = 'nomore';
+					return; // 如果已经到达最后一页，则不再加载
+				}
+				this.status = 'loading'; // 设置加载状态为正在加载
+				this.params.page++; // 增加页码
+				try {
+					const res = await paramsGet('/1700-2', this.params); // 调用接口加载更多数据
+					if (res && res.showapi_res_body.contentlist) {
+						// 将新加载的数据添加到列表中
+						this.list = this.list.concat(res.showapi_res_body.contentlist);
+					}
+					console.log(this.params.page, this.allPages)
+					if (this.params.page >= this.allPages) {
+						// 如果加载到最后一页，则设置状态为没有更多了
+						this.status = 'nomore';
+					} else {
+						// 如果还有更多数据可以加载，则设置状态为加载更多
+						this.status = 'loadmore';
+					}
+				} catch (error) {
+					console.error("加载更多数据失败", error);
+					// 加载失败时将状态设置为加载更多，以便用户可以再次触发加载
+					this.status = 'loadmore';
+				}
 			},
 			// 切换tab
 			handleTabClick(tab){
 				this.params.classifyId = tab.classifyId
 				this.getContentList()
+				// localStorage.setItem('selectedClassifyId', tab.classifyId);
 			},
 			// 详情
 			toDetail(item){
@@ -163,6 +273,10 @@
 		height: 100%;
 		width: 100%;
 		position: relative;
+		.swiper-header{
+			padding: 10px 0;
+			// height: 200px;
+		}
 		.search-header{
 			padding: 10px 12px;
 			padding-bottom: 8px;
@@ -191,7 +305,7 @@
 			width: 100%;
 			box-sizing: border-box;
 			padding: 10px 12px;
-			padding-bottom: 20px;
+			// padding-bottom: 20px;
 			display: grid;
 			grid-gap: 20px;
 			// grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); // 设置自适应列数，每列最小宽度200px，最大占据可用空间
@@ -252,6 +366,11 @@
 					background-position: 0% 100%;
 					box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
 					border-radius: 4px; 
+					&:active {
+						transform: scale(0.98);
+						opacity: 0.9;
+						transition: 100ms;
+					}
 				}
 				
 				.book-title{
@@ -280,6 +399,9 @@
 					}
 				}
 			}
+		}
+		.list-status{
+			padding: 10px 0 20px 0;
 		}
 		.list-empty{
 			width: 100%;

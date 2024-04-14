@@ -1,9 +1,9 @@
 <template>
 	<view class="page">
 		<transition name="book-open">
-			
-			<view v-if="isBookOpen" class="book-content">
-				<div v-html="content">{{content}}</div>
+			<view v-if="isBookOpen" class="book-box">
+				<!-- <div class="title">{{title}}</div> -->
+				<div class="content" v-html="content">{{content}}</div>
 			</view>
 		</transition>
 	</view>
@@ -24,9 +24,13 @@
 			console.log(option.title);
 			this.title = option.title
 			this.id = option.id
+			uni.setNavigationBarTitle({
+			    title: this.title
+			});
 		},
 		mounted(){
 			this.getContent(this.id)
+			 document.title = this.title; 
 		},
 		methods: {
 			async getContent(id) {
@@ -49,9 +53,26 @@
 
 <style lang="scss" scoped>
 	.page{
-		padding:50px 0 ;
-		.book-content{
-			padding: 0px 20px;
+		min-height: calc(100vh - 44px);
+		overflow: auto;
+		background-image: url(@/static/book-bg.png);
+		background-color: #fff;
+		background-size: 100% 100%;
+		.book-box{
+			padding: 20px;
+			padding-bottom: 40px;
+			.title{
+				width: 100%;
+				text-align: center;
+				font-size: 18px;
+				font-weight: 700;
+				padding-bottom: 15px;
+			}
+			.content{
+				letter-spacing: 1px;
+				text-indent: 2em;
+				line-height: 2em;
+			}
 		}
 	}
 	/* 定义过渡效果 */
