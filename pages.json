@@ -18,7 +18,7 @@
 		{
 			"path": "pages/bookdetail/bookdetail",
 			"style": {
-				"navigationBarTitleText": "爱阅读",
+				"navigationBarTitleText": "阅读宝",
 			
 				"navigationBarBackgroundColor": "#e8d4af"
 				// "enablePullDownRefresh": false,
