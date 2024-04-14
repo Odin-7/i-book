@@ -39,8 +39,14 @@
 				<!-- v-else -->
 			</view>
 		</u-sticky>
-		<!-- <u-gap height="20" bg-color="#f2f2f2"></u-gap> -->
-		<view class="list-main" v-if="list && list.length > 0">
+		<!-- 加载中 -->
+		<view class="is-loading" v-if="isLoading">
+			<Loading />
+		    <div class="text">嘘！书本正在悄悄赶来，不要吓到它哦！</div>
+		</view>
+		<!-- 列表 -->
+		
+		<view class="list-main" v-else-if="list && list.length > 0">
 			<div 
 				v-for="(item, index) in list"
 				:key="item.id"
@@ -50,12 +56,10 @@
 					<div class="book-title">{{item.title}}</div>
 			</div>
 		</view>
+		<!-- 空 -->
 		<view class="list-empty" v-else>
-			<!-- icon="https://cdn.uviewui.com/uview/demo/empty/data.png" -->
-			<u-empty
-				mode="search"
-			>
-			</u-empty>
+			<img src="@/static/books/no-data.png" alt="">
+			<div class="text">图书躲起来啦，再找找吧！</div>
 		</view>
 		<!-- 返回顶部 -->
 		<view class="back-top">
@@ -67,20 +71,25 @@
 <script>
 	import { paramsGet } from '@/utils/request.js'
 	import { debounce } from '@/utils/debounce.js'
+	import Loading from '@/components/loading/loading.vue'
 	export default {
 		data() {
 			return {
+				isLoading:false,
 				scrollTop: 0,//返回顶部
 				params:{
 					keyword: '',
 					classifyId:1, //分类
-					page:1 //页码
+					page:2 //页码
 				},
 				id:'',//故事详情id
 				tabs: [], //分类
 				list:[],
 				indexList: [],
 			}
+		},
+		components: {
+			Loading
 		},
 		created() {
 			this.getClassifyTabs();
@@ -101,21 +110,24 @@
 						  classifyId: item.classifyId 
 						}));
 					}
-				 } catch (error) {
+				} catch (error) {
 					console.log("获取分类信息失败", error);
-				  }
+				} 
 			},
 			// 获取列表
 			async getContentList() {
+				this.isLoading = true
 				try {
 					// const res = await classifyGet(`/1700-1?showapi_appid=1571609&showapi_timestamp=${getCurrentDateTime()}&showapi_sign=bf08e510d4a642fb9e168ada13400dbf`)
 					const res = await paramsGet('/1700-2',this.params)
 					if(res && res.showapi_res_body.contentlist){
 						this.list = res.showapi_res_body.contentlist
 					}
-				 } catch (error) {
+				} catch (error) {
 					console.log("获取书籍列表失败", error);
-				  }
+				} finally{
+					this.isLoading = false
+				}
 				
 			},
 			// 切换tab
@@ -159,6 +171,21 @@
 			height: 34px;
 			padding-bottom: 3px;
 			border-bottom: 1px solid #f2f2f2;
+		}
+		.is-loading{
+			width: 100%;
+			margin-top: 15vh;
+			// height: calc(100vh - 250px);
+			// padding-top: 30%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			.text{
+				font-size: 14px;
+				margin-top: 10px;
+				color: #606266;
+			}
 		}
 		.list-main{
 			width: 100%;
@@ -255,7 +282,20 @@
 			}
 		}
 		.list-empty{
-			margin-top: 25%;
+			width: 100%;
+			margin-top: 15vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			>img{
+				height: 80px;
+			}
+			.text{
+				font-size: 14px;
+				margin-top: 20px;
+				color: #606266;
+			}
 		}
 	}
 </style>

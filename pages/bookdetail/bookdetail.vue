@@ -1,6 +1,7 @@
 <template>
 	<view class="page">
 		<transition name="book-open">
+			
 			<view v-if="isBookOpen" class="book-content">
 				<div v-html="content">{{content}}</div>
 			</view>
