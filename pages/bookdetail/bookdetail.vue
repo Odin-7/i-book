@@ -20,8 +20,6 @@
 			}
 		},
 		onLoad: function (option) {
-			console.log(option.id);
-			console.log(option.title);
 			this.title = option.title
 			this.id = option.id
 			uni.setNavigationBarTitle({
@@ -34,10 +32,8 @@
 		},
 		methods: {
 			async getContent(id) {
-				console.log(id)
 				try {
 					const res = await paramsGet('/1700-3',{id})
-					console.log(res)
 					if(res && res.showapi_res_body.content){
 						// 在获取内容后设置状态为打开书本效果
 						this.content = res.showapi_res_body.content

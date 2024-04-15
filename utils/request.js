@@ -26,7 +26,8 @@ export function paramsGet(url, data) {
 			method: "GET",
 			data: requestData,
 			success: function(res) {
-				resolve(res.data)
+				// resolve(res.data)
+				if (res.statusCode === 200 && res.data && res.data.showapi_res_code === 0) {					resolve(res.data);				}
 			},
 			fail: function(err) {
 				reject(err)

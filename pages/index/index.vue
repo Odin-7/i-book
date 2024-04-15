@@ -1,10 +1,9 @@
 <template>
 	<view class="container">
-		
 		<!-- 搜索 -->
 		<view class="search-header">
 			<u-search
-				@change = "getContentList"
+				@change = "debounceSearch"
 				shape="round"
 				v-model="params.keyword"
 				placeholder="搜索书库"
@@ -19,6 +18,8 @@
 		</view>
 		<view class="swiper-header" v-if="!params.keyword">
 		   <u-swiper
+				:current="currentSwiperIndex"
+				:interval = "4000"
 				height = "300"
 				:list="swiperList"
 				previousMargin="55"
@@ -29,14 +30,17 @@
 				bgColor="#ffffff"
 				:autoplay="true"
 				circular
+				@click="handleSwiperClick"
 			></u-swiper>
 		</view>
 		<!-- tab栏 -->
 		<u-sticky offset-top="30" bgColor="#ffffff">
 			<view class="tabs-header">
+				<!-- :lineColor="`url(${tabBg}) top center`" -->
 				<u-tabs
 					v-if="tabs && tabs.length > 0"
 					swipeable  
+					:current="currentTabIndex"
 					:list="tabs"
 					 lineWidth="20px"
 					 lineHeight="3px"
@@ -47,6 +51,7 @@
 					}"
 					:inactiveStyle="{
 						color: '#606266',
+						
 					}"
 					itemStyle="padding-left: 15px; padding-right: 15px; height: 34px;"
 					@click="handleTabClick"
@@ -62,13 +67,13 @@
 		<!-- 列表 -->
 		
 		<view v-else-if="list && list.length > 0">
-			<div class="list-main">
+			<div class="list-main transition">
 				<div
 					v-for="(item, index) in list"
 					:key="item.id"
 					class="list-item"
 					>
-						<div class="book-cover" @click="toDetail(item)"></div>
+						<div class="book-cover"  @click="toDetail(item)"></div>
 						<div class="book-title">{{item.title}}</div>
 				</div>
 			</div>
@@ -86,9 +91,13 @@
 			<u-back-top 
 				:scroll-top="scrollTop" 
 				top="1000" 
-				icon="arrow-up" 	
+				icon="arrow-upward" 	
 				:duration="250"
-			></u-back-top>
+				:iconStyle="iconStyle"
+				:custom-style="myBackToTopStyle"
+			
+			>
+			</u-back-top>
 		</view>
 	</view>
 </template>
@@ -96,6 +105,7 @@
 <script>
 	import { paramsGet } from '@/utils/request.js'
 	import { debounce } from '@/utils/debounce.js'
+	console.log(debounce)
 	import Loading from '@/components/loading/loading.vue'
 	export default {
 		data() {
@@ -109,7 +119,8 @@
 				},
 				allNum: 0, //总数
 				allPages: 0, // 总页数
-				
+				currentTabIndex: 0,// 当前选中tab的索引
+				currentSwiperIndex:0, // 当前选中Swiper的索引
 				id:'',//故事详情id
 				tabs: [], //分类
 				list:[],
@@ -161,6 +172,20 @@
 						title: '王尔德童话'
 					},
 				],
+				// 自定义返回按钮样式
+				myBackToTopStyle: {
+					background:'transparent',
+					backgroundImage:'url(/static/tab-bg.png)',
+					backgroundSize: 'cover',
+					backgroundRepeat: 'no-repeat',
+					boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' // 添加阴影
+				},
+				iconStyle: {
+					color: '#ffffff',
+					fontWeight:'700',
+					position: 'relative',
+					top:'-30px',
+				}
 			}
 		},
 		components: {
@@ -241,20 +266,39 @@
 			},
 			// 切换tab
 			handleTabClick(tab){
+				if(tab.classifyId === this.params.classifyId) return
 				this.params.classifyId = tab.classifyId
 				this.getContentList()
 				// localStorage.setItem('selectedClassifyId', tab.classifyId);
+				// 切换到对应Swiper
+				this.currentSwiperIndex = tab.index
+				
+			},
+			// 点击Swiper
+			handleSwiperClick(index){
+				// 相同 return
+				if(index === this.currentTabIndex) return
+				this.currentTabIndex = index
+				// 切换到对应的标签页并刷新内容列表
+				const tab = this.tabs[index];
+				if (tab) {
+					this.params.classifyId = tab.classifyId;
+					this.getContentList();
+				}
 			},
 			// 详情
 			toDetail(item){
-				uni.navigateTo({
-					url: `../bookdetail/bookdetail?id=${item.id}&title=${item.title}`
-				})
+				setTimeout(() => {
+					  uni.navigateTo({
+						url: `../bookdetail/bookdetail?id=${item.id}&title=${item.title}`
+					  })
+				}, 100); 
+				
 			},
-			// 搜索
-			// onSearch: debounce(() => {
-			// 	this.getContentList();
-			// }, 300),
+			// 搜索/防抖
+			 debounceSearch: debounce(function() {
+			    this.getContentList();
+			  }, 500),
 			onCancel(){
 				this.params.keyword = ''
 			}
@@ -367,9 +411,9 @@
 					box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
 					border-radius: 4px; 
 					&:active {
-						transform: scale(0.98);
+						transform: scale(0.98) translateY(3px);
 						opacity: 0.9;
-						transition: 100ms;
+						transition: 80ms;
 					}
 				}
 				
@@ -418,6 +462,8 @@
 				margin-top: 20px;
 				color: #606266;
 			}
+		}
+		.back-top{
 		}
 	}
 </style>
